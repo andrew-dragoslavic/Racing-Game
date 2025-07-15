@@ -8,16 +8,16 @@ from preprocessing import FrameStackWrapper
 from replay_buffer import ReplayBuffer
 from ddqn_agent import DDQNAgent
 
-EPISODES = 2000
-START_TRAINING = 1000
-TARGET_UPDATE_FREQ = 200
-BATCH_SIZE = 32
+EPISODES = 5000
+START_TRAINING = 5000
+TARGET_UPDATE_FREQ = 500
+BATCH_SIZE = 64
 
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.00005
 GAMMA = 0.99
 EPSILON_START = 1.0
-EPSILON_END = 0.1
-EPSILON_DECAY = 0.995
+EPSILON_END = 0.05
+EPSILON_DECAY = 0.9995
 
 BUFFER_SIZE = 50000
 INPUT_SHAPE = (4, 84, 84)
@@ -52,6 +52,9 @@ def train():
 
             state = next_state
         episode_rewards.append(episode_reward)
+
+        if episode % 5 == 0:
+            print(f'Episode Number: {episode}, Buffer Size: {len(replay_buffer)}')
 
         if episode % 100 == 0:
             avg_reward = np.mean(episode_rewards[-100:])
