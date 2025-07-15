@@ -64,6 +64,28 @@ class FrameStackWrapper(gym.Wrapper):
     def _get_observation(self):
         return np.array(list(self.frames), dtype=np.float32)
     
+    def check_road_visibility(self, observation):
+        """Oliver's road visibility check"""
+        # Convert to RGB if needed
+        if len(observation.shape) == 4:  # Batch dimension
+            rgb_frame = observation[0]
+        else:
+            rgb_frame = observation
+            
+        # Take last frame from stack
+        if len(rgb_frame.shape) == 3 and rgb_frame.shape[0] == 4:
+            rgb_frame = rgb_frame[-1]  # Last frame
+            
+        # Convert to 0-255 range if normalized
+        if rgb_frame.max() <= 1.0:
+            rgb_frame = (rgb_frame * 255).astype(np.uint8)
+            
+        # Create mask to detect road (gray pixels)
+        mask = cv2.inRange(rgb_frame, np.array([100, 100, 100]), np.array([150, 150, 150]))
+        
+        # Return True if road is visible
+        return np.any(mask == 255)
+    
 def test_preprocessing():
     """Test the preprocessing pipeline"""
     

@@ -1,8 +1,8 @@
 import gymnasium as gym
 import torch
 import numpy as np
-from preprocessing import FrameStackWrapper
-from ddqn_agent import DDQNAgent
+from processing.preprocessing import FrameStackWrapper
+from models.ddqn_agent import DDQNAgent
 
 # Same parameters as training
 INPUT_SHAPE = (4, 84, 84)
@@ -21,7 +21,7 @@ def test_agent(model_path, num_episodes=5, render=True):
     
     # Create agent and load trained model
     agent = DDQNAgent(INPUT_SHAPE, NUM_ACTIONS, LEARNING_RATE, GAMMA, EPSILON_START, EPSILON_END, EPSILON_DECAY)
-    agent.main_network.load_state_dict(torch.load(model_path))
+    agent.main_network.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     agent.main_network.eval()  # Set to evaluation mode
     print("Model loaded successfully!")
 
@@ -72,4 +72,4 @@ def test_agent(model_path, num_episodes=5, render=True):
 
 if __name__ == "__main__":
     # Test with the final saved model
-    test_agent("ddqn_model_final.pth", num_episodes=5, render=True)
+    test_agent("ddqn_model_episode_1500.pth", num_episodes=5, render=True)
