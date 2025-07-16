@@ -4,7 +4,7 @@ from ..utils.preprocessing import CarRacingPreprocessor
 
 class CarRacingWrapper:
     def __init__(self, env_name = "CarRacing-v3", render_mode = None):
-        self.env = gym.make(env_name, render_mode=render_mode, continuous = False)
+        self.env = gym.make(env_name, render_mode=render_mode, continuous = True)
         self.preprocessor = CarRacingPreprocessor()
         self.negative_reward_counter = 0
         self.grass_counter = 0
@@ -21,7 +21,8 @@ class CarRacingWrapper:
         return processed_state
     
     def step(self, action_index):
-        action = self.action_space[action_index]
+        action_tuple = self.action_space[action_index]
+        action = np.array(action_tuple, dtype=np.float32)
         raw_next_state, reward, terminated, truncated, info = self.env.step(action)
         reward = np.clip(reward, a_min = -10, a_max = 1)
         if reward < 0:

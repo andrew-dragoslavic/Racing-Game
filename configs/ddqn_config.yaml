@@ -1,0 +1,48 @@
+# DDQN Configuration - matching DDQN3 hyperparameters
+
+# Model Configuration
+model:
+  input_channels: 1
+  n_actions: 12
+  hidden_dim: 216
+
+# Training Configuration
+training:
+  episodes: 2000
+  batch_size: 20
+  target_update_steps: 5
+  save_training_freq: 100
+  learning_rate: 0.001
+  gamma: 0.95
+  epsilon: 1.0
+  epsilon_min: 0.1
+  epsilon_decay: 0.9999
+
+# Environment Configuration
+environment:
+  max_penalty: -30
+  consecutive_neg_reward: 25
+  skip_frames: 2
+  steps_on_grass: 20
+  render: true
+
+# Replay Buffer Configuration
+replay_buffer:
+  replay_buffer: 150000
+  alpha: 0.6
+  beta: 0.4
+  beta_increment: 0.001
+
+# Parallel Training (optional)
+parallel:
+  num_envs: 10  # Set to 4 or 8 for parallel training
+
+# System Configuration
+system:
+  device: 'cuda'  # or 'cpu'
+  username: 'default'
+
+# Logging
+logging:
+  log_interval: 10
+  eval_interval: 100

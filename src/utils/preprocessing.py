@@ -10,7 +10,7 @@ class CarRacingPreprocessor:
     def process_state(self, state):
         state = cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)
         state = state.astype(float) / 255.0
-        state = torch.tensor(state).unsqueeze(0)
+        state = torch.tensor(state).float().unsqueeze(0)
         return state
     
     def check_road_visible(self, state):
