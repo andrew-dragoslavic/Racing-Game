@@ -32,7 +32,7 @@ class DDQNNetwork(nn.Module):
         torch.save(self.state_dict(), filepath)
 
     def load_checkpoint(self, filepath):
-        state_dict = torch.load(filepath)
+        state_dict = torch.load(filepath, weights_only=False)
         self.load_state_dict(state_dict)
 
     def get_action_values(self, state):

@@ -152,9 +152,8 @@ class DDQNAgent:
 
     def load_agent(self, filepath):
         """Load saved agent state"""
-        checkpoint = torch.load(filepath, map_location=self.device)
+        checkpoint = torch.load(filepath, map_location=self.device, weights_only=False)
         self.main_network.load_state_dict(checkpoint['main_network'])
         self.target_network.load_state_dict(checkpoint['target_network'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.epsilon = checkpoint['epsilon']
-        # Note: config is not loaded as it's set during initialization
