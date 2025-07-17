@@ -10,7 +10,17 @@ import argparse
 import numpy as np
 
 def parse_arguments():
-    """Parse command line arguments"""
+    """
+    Parses command-line arguments for testing a trained DDQN Agent on the CarRacing environment.
+
+    Returns:
+        argparse.Namespace: Parsed arguments including:
+            --model (str): Path to trained model file (required).
+            --config (str): Path to configuration file (default: 'configs/ddqn_config.yaml').
+            --episodes (int): Number of test episodes (default: 50).
+            --render (bool): Whether to render the environment during testing.
+            --device (str): Device to use: 'cpu' or 'cuda' (default: 'cpu').
+    """
     parser = argparse.ArgumentParser(description='Test trained DDQN Agent on CarRacing')
     parser.add_argument('--model', type=str, required=True,
                        help='Path to trained model file')
@@ -25,6 +35,12 @@ def parse_arguments():
     return parser.parse_args()
 
 def main():
+    """
+    Main function to test a trained DDQN Agent on the CarRacing environment.
+
+    This function parses command-line arguments, loads the configuration, initializes the trainer,
+    loads the trained model, evaluates the agent, and saves the results to a CSV file.
+    """
     # Parse arguments
     args = parse_arguments()
     

@@ -1,10 +1,53 @@
 import yaml
 
 class DDQNConfig:
+    """
+    Configuration class for the DDQN agent and training process.
+
+    Attributes:
+        episodes (int): Number of training episodes.
+        batch_size (int): Batch size for experience replay.
+        target_update_steps (int): Steps between target network updates.
+        save_training_freq (int): Frequency of saving training checkpoints.
+        learning_rate (float): Learning rate for the optimizer.
+        gamma (float): Discount factor for future rewards.
+        epsilon (float): Initial exploration rate for epsilon-greedy policy.
+        epsilon_min (float): Minimum exploration rate.
+        epsilon_decay (float): Decay rate for epsilon.
+        max_penalty (float): Maximum penalty for negative rewards.
+        consecutive_neg_reward (int): Threshold for consecutive negative rewards.
+        skip_frames (int): Number of frames to skip during training.
+        steps_on_grass (int): Maximum steps allowed on grass.
+        replay_buffer (int): Capacity of the replay buffer.
+        render (bool): Whether to render the environment during training.
+        device (str): Device to use for training (e.g., 'cpu' or 'cuda').
+    """
+
     def __init__(self, episodes=2000, batch_size=20, target_update_steps=5, save_training_freq=100, 
                  learning_rate=0.001, gamma=0.95, epsilon=1.0, epsilon_min=0.1, epsilon_decay=0.9999, 
                  max_penalty=-30, consecutive_neg_reward=25, skip_frames=2, steps_on_grass=20, 
                  replay_buffer=150000, render=True, device='cpu'):
+        """
+        Initialize the DDQNConfig with default or provided values.
+
+        Args:
+            episodes (int): Number of training episodes.
+            batch_size (int): Batch size for experience replay.
+            target_update_steps (int): Steps between target network updates.
+            save_training_freq (int): Frequency of saving training checkpoints.
+            learning_rate (float): Learning rate for the optimizer.
+            gamma (float): Discount factor for future rewards.
+            epsilon (float): Initial exploration rate for epsilon-greedy policy.
+            epsilon_min (float): Minimum exploration rate.
+            epsilon_decay (float): Decay rate for epsilon.
+            max_penalty (float): Maximum penalty for negative rewards.
+            consecutive_neg_reward (int): Threshold for consecutive negative rewards.
+            skip_frames (int): Number of frames to skip during training.
+            steps_on_grass (int): Maximum steps allowed on grass.
+            replay_buffer (int): Capacity of the replay buffer.
+            render (bool): Whether to render the environment during training.
+            device (str): Device to use for training (e.g., 'cpu' or 'cuda').
+        """
         self.episodes = episodes
         self.batch_size = batch_size
         self.target_update_steps = target_update_steps
@@ -24,6 +67,15 @@ class DDQNConfig:
 
     @classmethod
     def from_yaml(cls, yaml_path):
+        """
+        Load configuration from a YAML file.
+
+        Args:
+            yaml_path (str): Path to the YAML configuration file.
+
+        Returns:
+            DDQNConfig: An instance of DDQNConfig with values loaded from the YAML file.
+        """
         with open(yaml_path, 'r') as file:
             yaml_data = yaml.safe_load(file)
         
@@ -54,6 +106,12 @@ class DDQNConfig:
         )
 
     def to_dict(self):
+        """
+        Convert the configuration to a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the configuration.
+        """
         return {
             'episodes': self.episodes,
             'batch_size': self.batch_size,
@@ -74,6 +132,15 @@ class DDQNConfig:
         }
 
     def validate(self):
+        """
+        Validate the configuration values.
+
+        Raises:
+            ValueError: If any configuration value is invalid.
+
+        Returns:
+            bool: True if all values are valid.
+        """
         # Your existing validation code
         if not isinstance(self.episodes, int) or self.episodes <= 0:
             raise ValueError("Episodes must be a positive integer.")

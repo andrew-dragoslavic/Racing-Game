@@ -7,7 +7,26 @@ from ..models.ddqn_network import DDQNNetwork
 from ..replay_buffer.prioritized_buffer import PrioritizedReplayBuffer
 
 class DDQNAgent:
+    """
+    A Deep Double Q-Network (DDQN) agent for training and evaluation.
+
+    Attributes:
+        config: Configuration object containing hyperparameters.
+        device: Device to run computations on (CPU or GPU).
+        main_network: Main DDQN network for action-value estimation.
+        target_network: Target DDQN network for stable training.
+        buffer: Replay buffer for storing and sampling experiences.
+        optimizer: Optimizer for training the main network.
+        epsilon: Exploration rate for epsilon-greedy policy.
+    """
+
     def __init__(self, config):
+        """
+        Initialize the DDQNAgent with the given configuration.
+
+        Args:
+            config: Configuration object containing hyperparameters.
+        """
         self.config = config
         self.device = torch.device(config.device if torch.cuda.is_available() else 'cpu')
         
@@ -42,6 +61,16 @@ class DDQNAgent:
         self.epsilon = config.epsilon
 
     def choose_action(self, state, best=False):
+        """
+        Choose an action based on the current state using epsilon-greedy policy.
+
+        Args:
+            state (np.ndarray or torch.Tensor): Current state of the environment.
+            best (bool): If True, always choose the best action (default: False).
+
+        Returns:
+            int: Index of the chosen action.
+        """
         if isinstance(state, np.ndarray):
             state = torch.from_numpy(state).float().to(self.device)
         elif isinstance(state, torch.Tensor):
@@ -62,6 +91,16 @@ class DDQNAgent:
             return action_idx
         
     def store_transition(self, state, action, reward, next_state, done):
+        """
+        Store a transition in the replay buffer.
+
+        Args:
+            state (np.ndarray or torch.Tensor): Current state.
+            action (int): Action taken.
+            reward (float): Reward received.
+            next_state (np.ndarray or torch.Tensor): Next state.
+            done (bool): Whether the episode is done.
+        """
         # Convert tensors to numpy for storage (saves memory)
         if isinstance(state, torch.Tensor):
             state = state.cpu().numpy()
@@ -72,6 +111,12 @@ class DDQNAgent:
         self.buffer.add(state, action, reward, next_state, done)
 
     def experience_replay(self):
+        """
+        Perform experience replay to train the main network using sampled experiences.
+
+        Returns:
+            None
+        """
         if not self.buffer.is_ready(self.config.batch_size):
             return
 
@@ -123,23 +168,53 @@ class DDQNAgent:
             self.epsilon *= self.config.epsilon_decay
 
     def update_target_network(self):
+        """
+        Update the target network by copying weights from the main network.
+
+        Returns:
+            None
+        """
         self.target_network.copy_weights_from(self.main_network)
 
     def get_exploration_rate(self):
+        """
+        Get the current exploration rate (epsilon).
+
+        Returns:
+            float: Current epsilon value.
+        """
         """Return current epsilon value"""
         return self.epsilon
     
     def eval_mode(self):
+        """
+        Set the agent to evaluation mode.
+
+        Returns:
+            None
+        """
         """Set agent to evaluation mode"""
         self.main_network.eval()
         self.target_network.eval()
 
     def train_mode(self):
+        """
+        Set the agent to training mode.
+
+        Returns:
+            None
+        """
         """Set agent to training mode"""
         self.main_network.train()
         self.target_network.train()
 
     def save_agent(self, filepath):
+        """
+        Save the agent's state to a file.
+
+        Args:
+            filepath (str): Path to save the agent's state.
+        """
         """Save complete agent state"""
         checkpoint = {
             'main_network': self.main_network.state_dict(),
@@ -151,6 +226,12 @@ class DDQNAgent:
         torch.save(checkpoint, filepath)
 
     def load_agent(self, filepath):
+        """
+        Load the agent's state from a file.
+
+        Args:
+            filepath (str): Path to the saved agent's state.
+        """
         """Load saved agent state"""
         checkpoint = torch.load(filepath, map_location=self.device, weights_only=False)
         self.main_network.load_state_dict(checkpoint['main_network'])

@@ -9,7 +9,16 @@ from src.training.trainer import DDQNTrainer
 import argparse
 
 def parse_arguments():
-    """Parse command line arguments"""
+    """
+    Parse command line arguments for training the DDQN Agent.
+
+    Returns:
+        argparse.Namespace: Parsed arguments including:
+            --config (str): Path to configuration file (default: 'configs/ddqn_config.yaml').
+            --episodes (int): Number of episodes to train (overrides config).
+            --device (str): Device to use: 'cpu' or 'cuda' (overrides config).
+            --resume (str): Path to checkpoint to resume training from.
+    """
     parser = argparse.ArgumentParser(description='Train DDQN Agent on CarRacing')
     parser.add_argument('--config', type=str, default='configs/ddqn_config.yaml',
                        help='Path to configuration file')
@@ -22,6 +31,12 @@ def parse_arguments():
     return parser.parse_args()
 
 def main():
+    """
+    Main function to train the DDQN Agent on the CarRacing environment.
+
+    This function parses command-line arguments, loads the configuration, initializes the trainer,
+    optionally resumes training from a checkpoint, and starts the training process.
+    """
     # Parse arguments
     args = parse_arguments()
     

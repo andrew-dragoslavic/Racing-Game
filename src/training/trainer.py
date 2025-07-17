@@ -8,7 +8,27 @@ from ..environment.env_wrapper import CarRacingWrapper
 from ..environment.parallel_env import make_parallel_env
 
 class DDQNTrainer:
+    """
+    Trainer class for training and evaluating a DDQN agent on the CarRacing environment.
+
+    Attributes:
+        config: Configuration object containing hyperparameters.
+        agent: The DDQN agent being trained.
+        env: The environment or parallel environments for training.
+        is_parallel: Whether the trainer uses parallel environments.
+        model_dir: Directory to save model checkpoints.
+        reward_dir: Directory to save reward data.
+        episode_rewards: List to track rewards and exploration rates per episode.
+        episode_count: Counter for the number of episodes completed.
+    """
+
     def __init__(self, config):
+        """
+        Initialize the DDQNTrainer with the given configuration.
+
+        Args:
+            config: Configuration object containing hyperparameters.
+        """
         self.config = config
         self.agent = DDQNAgent(config)
         if hasattr(config, 'num_envs') and config.num_envs > 1:
@@ -34,6 +54,12 @@ class DDQNTrainer:
         self.episode_count = 0
 
     def train(self, num_episodes):
+        """
+        Train the DDQN agent for a specified number of episodes.
+
+        Args:
+            num_episodes (int): Number of episodes to train.
+        """
         print(f"Starting training for {num_episodes} episodes...")
         
         for episode in tqdm(range(num_episodes)):
@@ -58,7 +84,13 @@ class DDQNTrainer:
         print("Training completed!")
 
     def _run_episode(self):
-    # Reset environment
+        """
+        Run a single training episode.
+
+        Returns:
+            float: Total reward for the episode.
+        """
+        # Reset environment
         state = self.env.reset()
         
         episode_reward = 0
@@ -91,6 +123,12 @@ class DDQNTrainer:
         return episode_reward
     
     def _save_checkpoint(self, episode):
+        """
+        Save the agent's state and rewards at a specific episode.
+
+        Args:
+            episode (int): The episode number to save the checkpoint for.
+        """
         # Save agent model
         model_filename = f"episode_{episode}.pth"
         model_path = os.path.join(self.model_dir, model_filename)
@@ -104,6 +142,16 @@ class DDQNTrainer:
         print(f"[INFO]: Saved checkpoint at episode {episode}")
 
     def evaluate_agent(self, num_episodes=10):
+        """
+        Evaluate the agent's performance over a number of episodes.
+
+        Args:
+            num_episodes (int): Number of episodes to evaluate (default: 10).
+
+        Returns:
+            tuple: A tuple containing average reward, standard deviation of rewards,
+                   minimum reward, maximum reward, and average time per episode.
+        """
         print(f"[INFO]: Evaluating agent for {num_episodes} episodes...")
         
         # Set agent to evaluation mode
@@ -150,7 +198,13 @@ class DDQNTrainer:
         return avg_reward, std_reward, min_reward, max_reward, avg_time
     
     def save_training_state(self, episode, filepath):
-        """Save complete training state for resuming"""
+        """
+        Save the complete training state for resuming later.
+
+        Args:
+            episode (int): The current episode number.
+            filepath (str): Path to save the training state.
+        """
         training_state = {
             'episode': episode,
             'episode_rewards': self.episode_rewards,
@@ -165,7 +219,15 @@ class DDQNTrainer:
         print(f"[INFO]: Saved complete training state at episode {episode}")
 
     def load_training_state(self, filepath):
-        """Load training state to resume training"""
+        """
+        Load a previously saved training state.
+
+        Args:
+            filepath (str): Path to the saved training state.
+
+        Returns:
+            int: The episode number to resume training from.
+        """
         training_state = torch.load(f"{filepath}_training_state.pth")
         
         self.episode_count = training_state['episode']
@@ -178,7 +240,14 @@ class DDQNTrainer:
         return training_state['episode']
 
     def get_training_stats(self):
-        """Return current training statistics"""
+        """
+        Get statistics about the current training progress.
+
+        Returns:
+            dict: A dictionary containing training statistics such as total episodes,
+                  current exploration rate, average reward for the last 100 episodes,
+                  buffer size, and recent rewards.
+        """
         if not self.episode_rewards:
             return {}
         
@@ -193,7 +262,12 @@ class DDQNTrainer:
         }
     
     def _run_parallel_episode(self):
-        """Run episode with parallel environments for faster data collection"""
+        """
+        Run a training episode using parallel environments.
+
+        Returns:
+            float: Average reward across all parallel environments.
+        """
         # Reset all environments
         states = self.env.reset()  # Returns array of states from all envs
         
